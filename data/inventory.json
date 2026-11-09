@@ -1,0 +1,31 @@
+{
+  "inventory": [
+    {
+      "id": 1,
+      "nama_produk": "Pupuk Urea Non-Subsidi",
+      "kategori": "Urea",
+      "stok": 150,
+      "satuan": "Sak (50kg)",
+      "harga_beli": 110000,
+      "harga_satuan": 125000
+    },
+    {
+      "id": 2,
+      "nama_produk": "Pupuk NPK Mutiara 16-16-16",
+      "kategori": "NPK",
+      "stok": 85,
+      "satuan": "Sak (50kg)",
+      "harga_beli": 135000,
+      "harga_satuan": 150000
+    },
+    {
+      "id": 3,
+      "nama_produk": "Pupuk Organik Granul",
+      "kategori": "Organik",
+      "stok": 200,
+      "satuan": "Karung",
+      "harga_beli": 35000,
+      "harga_satuan": 45000
+    }
+  ]
+}
