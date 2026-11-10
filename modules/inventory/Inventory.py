@@ -6,11 +6,6 @@ import streamlit as st
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.worksheet.table import Table as ExcelTable, TableStyleInfo
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.units import mm
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 
 from services.inventory_service import (
     add_movement,
@@ -23,6 +18,8 @@ from services.inventory_service import (
     seed_sample_products,
     upsert_products,
 )
+from utils.excel_converter import export_dataframe
+from utils.pdf_converter import inventory_pdf, movements_pdf
 
 
 def normalize_column_names(frame: pd.DataFrame) -> pd.DataFrame:
@@ -192,19 +189,6 @@ def excel_template() -> bytes:
     return output.getvalue()
 
 
-def format_excel_workbook(output: BytesIO, sheet_name: str, frame: pd.DataFrame) -> bytes:
-    with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        frame.to_excel(writer, sheet_name=sheet_name, index=False)
-        sheet = writer.book[sheet_name]
-        sheet.freeze_panes = "A2"
-        sheet.auto_filter.ref = sheet.dimensions
-        for column in sheet.columns:
-            width = min(max(len(str(cell.value or "")) for cell in column) + 2, 40)
-            column_letter = column[0].column_letter
-            sheet.column_dimensions[column_letter].width = width
-    return output.getvalue()
-
-
 def inventory_excel(items: list[dict]) -> bytes:
     frame = pd.DataFrame(items)
     columns = {
@@ -220,7 +204,7 @@ def inventory_excel(items: list[dict]) -> bytes:
         "harga_satuan": "Harga Jual",
     }
     frame = frame[list(columns)].rename(columns=columns)
-    return format_excel_workbook(BytesIO(), "Ringkasan Stok", frame)
+    return export_dataframe(frame, "Ringkasan Stok", "Laporan Inventaris SuperTani")
 
 
 def movements_excel(items: list[dict]) -> bytes:
@@ -228,72 +212,7 @@ def movements_excel(items: list[dict]) -> bytes:
         "id", "tanggal", "kode_produk", "jenis", "jumlah",
         "gudang", "referensi", "keterangan"
     ]]
-    return format_excel_workbook(BytesIO(), "Stock_Movement", frame)
-
-
-def inventory_pdf(items: list[dict]) -> bytes:
-    output = BytesIO()
-    document = SimpleDocTemplate(output, pagesize=landscape(A4), leftMargin=12*mm, rightMargin=12*mm)
-    styles = getSampleStyleSheet()
-    story = [Paragraph("LAPORAN INVENTARIS SUPERTANI", styles["Title"]),
-             Paragraph(f"Tanggal cetak: {date.today().strftime('%d-%m-%Y')}", styles["Normal"]), Spacer(1, 5*mm)]
-    header = ["Kode", "Nama Produk", "Kategori", "Stok", "Satuan", "Nilai Aset"]
-    rows = [header]
-    for item in items:
-        asset = float(item["stok"]) * float(item["harga_beli"])
-        rows.append([
-            str(item["kode_produk"]), str(item["nama_produk"]), str(item["kategori"]),
-            f'{float(item["stok"]):g}', str(item["satuan"]), f"Rp {asset:,.0f}"
-        ])
-    table = Table(rows, repeatRows=1)
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#173d32")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("GRID", (0, 0), (-1, -1), 0.4, colors.grey),
-        ("FONTSIZE", (0, 0), (-1, -1), 8),
-        ("BACKGROUND", (0, 1), (-1, -1), colors.white),
-        ("TEXTCOLOR", (0, 1), (-1, -1), colors.black),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-    ]))
-    story.append(table)
-    document.build(story)
-    return output.getvalue()
-
-
-def movements_pdf(items: list[dict]) -> bytes:
-    output = BytesIO()
-    document = SimpleDocTemplate(output, pagesize=landscape(A4), leftMargin=12*mm, rightMargin=12*mm)
-    styles = getSampleStyleSheet()
-    story = [
-        Paragraph("RIWAYAT PERGERAKAN STOK SUPERTANI", styles["Title"]),
-        Paragraph(f"Tanggal cetak: {date.today().strftime('%d-%m-%Y')}", styles["Normal"]),
-        Spacer(1, 5*mm),
-    ]
-    header = ["ID", "Tanggal", "Kode", "Jenis", "Jumlah", "Gudang", "Referensi", "Keterangan"]
-    rows = [header]
-    for item in items:
-        rows.append([
-            str(item["id"]), str(item["tanggal"]), str(item["kode_produk"]), str(item["jenis"]),
-            f'{float(item["jumlah"]):g}', str(item["gudang"] or ""), str(item["referensi"] or ""),
-            str(item["keterangan"] or ""),
-        ])
-    table = Table(rows, repeatRows=1, colWidths=[10*mm, 25*mm, 30*mm, 23*mm, 20*mm, 35*mm, 30*mm, 85*mm])
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#173d32")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("GRID", (0, 0), (-1, -1), 0.4, colors.grey),
-        ("FONTSIZE", (0, 0), (-1, -1), 7),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 4),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-    ]))
-    story.append(table)
-    document.build(story)
-    return output.getvalue()
+    return export_dataframe(frame, "Stock_Movement", "Riwayat Pergerakan Stok SuperTani")
 
 
 def movement_period(frame: pd.DataFrame, period: str) -> pd.DataFrame:
