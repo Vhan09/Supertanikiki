@@ -93,7 +93,26 @@ html, body, [class*="css"] {
     border-radius: 12px;
 }
 
-/* Form controls are kept light with dark text in every browser theme. */
+/* Use visible borders on the actual widget roots across Streamlit versions. */
+[data-testid="stTextInputRootElement"],
+[data-testid="stNumberInputContainer"],
+[data-testid="stTextAreaRootElement"],
+[data-baseweb="input"],
+[data-baseweb="textarea"] {
+    border: 1.5px solid #b8860b !important;
+    border-radius: 8px !important;
+    background-color: #ffffff !important;
+}
+
+[data-testid="stTextInputRootElement"]:focus-within,
+[data-testid="stNumberInputContainer"]:focus-within,
+[data-testid="stTextAreaRootElement"]:focus-within,
+[data-baseweb="input"]:focus-within,
+[data-baseweb="textarea"]:focus-within {
+    border-color: #111111 !important;
+    box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.2) !important;
+}
+
 [data-testid="stTextInput"] input,
 [data-testid="stNumberInput"] input,
 [data-testid="stTextArea"] textarea,

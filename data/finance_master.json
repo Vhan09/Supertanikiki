@@ -1,0 +1,48 @@
+{
+  "currency": "IDR",
+  "accounts": [
+    {
+      "code": "1101",
+      "name": "Kas Tunai",
+      "type": "cash",
+      "opening_balance": 5000000
+    },
+    {
+      "code": "1102",
+      "name": "Bank Operasional",
+      "type": "bank",
+      "opening_balance": 25000000
+    },
+    {
+      "code": "1103",
+      "name": "Bank Distribusi",
+      "type": "bank",
+      "opening_balance": 10000000
+    }
+  ],
+  "categories": {
+    "Pemasukan": [
+      "Penjualan Pupuk",
+      "Penjualan Benih",
+      "Penjualan Pestisida",
+      "Pendapatan Distribusi",
+      "Pendapatan Lain-lain",
+      "Modal Masuk"
+    ],
+    "Pengeluaran": [
+      "Pembelian Persediaan",
+      "Biaya Transportasi",
+      "Gaji & Upah",
+      "Biaya Operasional",
+      "Sewa & Utilitas",
+      "Pajak & Administrasi",
+      "Perawatan Kendaraan",
+      "Pengeluaran Lain-lain"
+    ]
+  },
+  "payment_methods": [
+    "Tunai",
+    "Transfer Bank",
+    "QRIS"
+  ]
+}

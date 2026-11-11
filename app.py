@@ -2,8 +2,10 @@
 
 from config import APP_ICON, APP_NAME
 from modules.dashboard.dashboard import render_dashboard
+from modules.finance.finance import render_finance
 from modules.inventory.Inventory import render_inventaris_page
 from modules.pages.placeholder import render_placeholder
+from modules.sales.sales import render_sales
 from modules.ui.navigation import render_sidebar
 from modules.ui.theme import APP_CSS
 from utils.session import initialize_session
@@ -23,6 +25,10 @@ def main() -> None:
         render_dashboard()
     elif selected_menu == "Inventaris & Gudang":
         render_inventaris_page()
+    elif selected_menu == "Penjualan & Distribusi":
+        render_sales()
+    elif selected_menu == "Keuangan & Akuntansi":
+        render_finance()
     else:
         render_placeholder(selected_menu)
 
