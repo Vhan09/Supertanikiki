@@ -1,4 +1,4 @@
-"""Create Excel reports with the shared Kaizen PBG report styling."""
+"""Create Excel reports with the shared Supertani Indonesia report styling."""
 from __future__ import annotations
 
 from datetime import date
@@ -19,7 +19,7 @@ MUTED = "536575"
 def _prepare_workbook(xlsx_bytes: bytes, title: str) -> bytes:
     workbook = load_workbook(BytesIO(xlsx_bytes))
     workbook.properties.title = title
-    workbook.properties.creator = "Kaizen PBG"
+    workbook.properties.creator = "Supertani Indonesia"
     for worksheet in workbook.worksheets:
         if worksheet.sheet_properties.pageSetUpPr is None:
             worksheet.sheet_properties.pageSetUpPr = PageSetupProperties()
@@ -33,7 +33,7 @@ def _prepare_workbook(xlsx_bytes: bytes, title: str) -> bytes:
         worksheet.page_margins.top = worksheet.page_margins.bottom = 0.55
         worksheet.page_margins.header = 0.2
         worksheet.page_margins.footer = 0.25
-        worksheet.oddFooter.left.text = f"Kaizen PBG | {title}"
+        worksheet.oddFooter.left.text = f"Supertani Indonesia | {title}"
         worksheet.oddFooter.left.size = 8
         worksheet.oddFooter.left.font = "Arial"
         worksheet.oddFooter.left.color = MUTED

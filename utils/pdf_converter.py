@@ -1,4 +1,4 @@
-"""Create Kaizen PBG styled PDF reports and convert XLSX files to PDF."""
+"""Create Supertani Indonesia styled PDF reports and convert XLSX files to PDF."""
 from __future__ import annotations
 
 import argparse
@@ -214,7 +214,7 @@ def document(
         topMargin=top * mm,
         bottomMargin=bottom * mm,
         title=title,
-        author="Kaizen PBG",
+        author="Supertani Indonesia",
     )
 
 
@@ -303,7 +303,7 @@ def footer(title: str):
         canvas.line(doc.leftMargin, 10 * mm, doc.pagesize[0] - doc.rightMargin, 10 * mm)
         canvas.setFont("Helvetica", 7)
         canvas.setFillColor(colors.HexColor("#65727D"))
-        canvas.drawString(doc.leftMargin, 6 * mm, f"Kaizen PBG - {title}")
+        canvas.drawString(doc.leftMargin, 6 * mm, f"Supertani Indonesia - {title}")
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             6 * mm,
